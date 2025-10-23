@@ -1,23 +1,21 @@
 import { renderHook, act } from "@testing-library/react-hooks";
-import { useLocalStorage } from "../exercise/04";
-// import { useLocalStorage } from "../solution/04.extra-2";
-
-beforeEach(() => {
-  localStorage.clear();
-  jest.clearAllMocks();
-  localStorage.setItem.mockClear();
-});
+import { useLocalStorage } from "../exercise/04"; // adjust path if needed
 
 describe("Exercise 04 - Bonus 2", () => {
-  test("updates state after storage events", async () => {
-    const { result } = renderHook(() => useLocalStorage("test", "old value"));
+  beforeEach(() => {
+    localStorage.clear();
+  });
 
+  test("updates state after storage events", () => {
+    const { result } = renderHook(() => useLocalStorage("test", "initial"));
+
+    // Simulate another tab updating localStorage
     act(() => {
-      // update localStorage and simulate storage event
-      localStorage.setItem("test", "new value");
+      localStorage.setItem("test", JSON.stringify("new value"));
       window.dispatchEvent(
         new StorageEvent("storage", {
           key: "test",
+          newValue: JSON.stringify("new value"),
         })
       );
     });
@@ -25,10 +23,14 @@ describe("Exercise 04 - Bonus 2", () => {
     expect(result.current[0]).toBe("new value");
   });
 
-  test("the event handler function is removed when the component unmounts", () => {
-    const spy = jest.spyOn(window, "removeEventListener");
-    const { unmount } = renderHook(() => useLocalStorage("test"));
+  test("removes the storage event listener on unmount", () => {
+    const addSpy = jest.spyOn(window, "addEventListener");
+    const removeSpy = jest.spyOn(window, "removeEventListener");
+
+    const { unmount } = renderHook(() => useLocalStorage("test", "initial"));
     unmount();
-    expect(spy).toHaveBeenCalledWith("storage", expect.any(Function));
+
+    expect(addSpy).toHaveBeenCalledWith("storage", expect.any(Function));
+    expect(removeSpy).toHaveBeenCalledWith("storage", expect.any(Function));
   });
 });

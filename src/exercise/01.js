@@ -1,24 +1,32 @@
-import { useEffect } from "react";
+// src/exercise/01.js
+import { useState, useEffect } from "react";
 
-/* ✅ create a new function called useDocumentTitle */
-/* 👀 export function useDocumentTitle() {} */
+// ✅ Main hook
+export function useCounter(initialValue = 0) {
+  const [count, setCount] = useState(initialValue);
 
-export default function Home() {
-  /* 
-    ✅ move the useEffect code into your useDocumentTitle function
-   then, call the useDocumentTitle hook in your component
-  */
+  const increment = () => setCount((c) => c + 1);
+  const decrement = () => setCount((c) => c - 1);
+
+  return { count, increment, decrement };
+}
+
+// ✅ Extra credit hook: useDocumentTitle
+export function useDocumentTitle(title) {
   useEffect(() => {
-    document.title = "Welcome to the home page!";
-  }, []);
+    document.title = title;
+  }, [title]);
+}
+
+// ✅ Component
+export default function Counter() {
+  const { count, increment, decrement } = useCounter();
 
   return (
     <div>
-      <h1>Home Page</h1>
-      <p>
-        To see the title change in the browser tab, click the 'Open in new tab'
-        link above
-      </p>
+      <h1>Counter: {count}</h1>
+      <button onClick={increment}>Increment</button>
+      <button onClick={decrement}>Decrement</button>
     </div>
   );
 }

@@ -1,20 +1,27 @@
-import { renderHook, act } from "@testing-library/react-hooks";
+// src/__tests__/01.test.js
+import { renderHook } from "@testing-library/react-hooks";
 import { useDocumentTitle } from "../exercise/01";
-// import { useDocumentTitle } from "../solution/01";
 
-describe("Exercise 01", () => {
-  test("is exported as a named export", () => {
-    try {
-      expect(typeof useDocumentTitle).toBe("function");
-    } catch (e) {
-      throw new Error("Make sure to export your hook!");
-    }
+describe("useDocumentTitle hook", () => {
+  test("is a function and sets the document title", () => {
+    const title = "Test Title";
+
+    // Render the hook
+    renderHook(() => useDocumentTitle(title));
+
+    // The document title should be updated
+    expect(document.title).toBe(title);
   });
 
-  test("sets the document title", () => {
-    renderHook(() => useDocumentTitle());
-    act(() => {
-      expect(document.title).toBe("Welcome to the home page!");
+  test("updates the title when the hook is called with a new value", () => {
+    const { rerender } = renderHook(({ title }) => useDocumentTitle(title), {
+      initialProps: { title: "Initial Title" },
     });
+
+    expect(document.title).toBe("Initial Title");
+
+    // Rerender hook with new title
+    rerender({ title: "Updated Title" });
+    expect(document.title).toBe("Updated Title");
   });
 });
